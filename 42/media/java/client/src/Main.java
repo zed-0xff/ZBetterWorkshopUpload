@@ -5,6 +5,8 @@ import me.zed_0xff.zombie_buddy.Patch;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import zombie.core.znet.SteamWorkshopItem;
 
@@ -139,6 +141,29 @@ public class Main {
         }
     }
 
+    @Patch(className = "zombie.Lua.LuaManager$GlobalObject", methodName = "getSteamWorkshopStagedItems")
+    public static class Patch_getSteamWorkshopStagedItems {
+        public static final java.util.Comparator<SteamWorkshopItem> comparator = new java.util.Comparator<SteamWorkshopItem>() {
+            @Override
+            public int compare(SteamWorkshopItem o1, SteamWorkshopItem o2) {
+                String folder1 = o1.getFolderName();
+                String folder2 = o2.getFolderName();
+                if (folder1 == null && folder2 == null) return 0;
+                if (folder1 == null) return -1;
+                if (folder2 == null) return 1;
+                return folder1.compareToIgnoreCase(folder2);
+            }
+        };
+
+        @Patch.OnExit
+        public static void exit(@Patch.Return(readOnly = false) ArrayList<SteamWorkshopItem> result) {
+            if (result != null) {
+                // sort results by getFolderName()
+                Collections.sort(result, comparator);
+            }
+        }
+    }
+
     // XXX these patches don't get triggered for some reason, have to use another way
     //
     // // Patch getContentFolder to return filtered folder when in SubmitWorkshopItem context
@@ -149,12 +174,12 @@ public class Main {
     //         System.out.println("[ZBetterWorkshopUpload] afterGetContentFolder");
     //     }
     // }
-
-    @Patch(className = "zombie.core.znet.SteamWorkshopItem", methodName = "getDescription")
-    public static class Patch_getDescription {
-        @Patch.OnExit
-        public static void exit() {
-            System.out.println("[ZBetterWorkshopUpload] afterGetDescription");
-        }
-    }
+    //
+    // @Patch(className = "zombie.core.znet.SteamWorkshopItem", methodName = "getDescription")
+    //public static class Patch_getDescription {
+    //    @Patch.OnExit
+    //    public static void exit() {
+    //        System.out.println("[ZBetterWorkshopUpload] afterGetDescription");
+    //    }
+    //}
 }
