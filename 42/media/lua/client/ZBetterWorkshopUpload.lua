@@ -14,7 +14,7 @@ function WorkshopSubmitScreen:create()
     local text6 = getText("UI_WorkshopSubmit_Legal2")
 
     for id, child in pairs(self.page5.children) do
-        print(id, child, child.Type)
+        -- print(id, child, child.Type)
         if child.Type == "ISLabel" then
             if child:getName() == text1 then
                 page5.label1 = child
