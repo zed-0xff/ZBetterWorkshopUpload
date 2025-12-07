@@ -10,7 +10,7 @@ If you find this mod useful, consider supporting the developer with a coffee!
 
 ## What It Does
 
-ZBetterWorkshopUpload automatically filters out unwanted files (like `.git`, `.DS_Store`, build artifacts, etc.) when uploading mods to the Steam Workshop. It also provides a preview of exactly which files will be uploaded before you submit.
+ZBetterWorkshopUpload automatically filters out unwanted files (like `.git`, `.DS_Store`, build artifacts, etc.) when uploading mods to the Steam Workshop. It also provides a preview of exactly which files will be uploaded before you submit, and supports description include directives for easier description management.
 
 ## Features
 
@@ -20,6 +20,8 @@ ZBetterWorkshopUpload automatically filters out unwanted files (like `.git`, `.D
 - ✅ **`.workshopignore` support**: Create `.workshopignore` files in your mod directories (similar to `.gitignore`) for project-specific exclusions
 - ✅ **Recursive ignore files**: `.workshopignore` files are checked recursively up the directory tree
 - ✅ **Comment support**: `.workshopignore` files support comments (lines starting with `#`) and empty lines
+- ✅ **Description includes**: Use `@include("filename")` directives in your workshop description to include file contents
+- ✅ **Complete folder structure**: Preserves entire workshop folder structure (including `preview.png`, `workshop.txt`, etc.) while filtering only the Contents folder
 
 ## Installation
 
@@ -97,15 +99,49 @@ Thumbs.db
 
 When uploading a mod to the Steam Workshop, ZBetterWorkshopUpload adds a preview listbox showing exactly which files will be uploaded. This helps you verify that unwanted files are being excluded correctly.
 
+### Description Includes
+
+ZBetterWorkshopUpload supports `@include()` directives in your workshop description. This allows you to include the contents of external files in your description, making it easier to maintain long descriptions or reuse content.
+
+**Syntax:**
+```
+@include("filename.txt")
+```
+
+**Example description:**
+```
+Welcome to my mod!
+
+@include("features.txt")
+
+For more information, see the included README.
+```
+
+**Features:**
+- Include files are read from the workshop folder root
+- Security: Path traversal (`..`) and absolute paths are blocked
+- Files are read as UTF-8 text
+- If a file doesn't exist, the include directive is ignored (with a warning in logs)
+- Multiple includes are supported per description
+
+**Use cases:**
+- Keep long feature lists in separate files
+- Reuse changelog content
+- Maintain descriptions in version control
+- Include formatted text from markdown files
+
 ## How It Works
 
 ZBetterWorkshopUpload uses [ZombieBuddy](https://github.com/zed-0xff/ZombieBuddy) to patch the game's workshop submission process:
 
 1. **Intercepts uploads**: Patches `SteamWorkshop.SubmitWorkshopItem()` to intercept upload requests
-2. **Filters content**: Creates a filtered copy of your mod content, excluding unwanted files
-3. **Temporary folder**: Uses a temporary filtered folder for the upload
-4. **Cleanup**: Automatically cleans up temporary files after upload completes
-5. **Preview integration**: Patches the workshop submission screen to show filtered file list
+2. **Processes description**: Expands `@include()` directives in the description before upload
+3. **Filters content**: Creates a filtered copy of your entire workshop folder, excluding unwanted files from the Contents folder only
+4. **Preserves structure**: Copies all files and folders (like `preview.png`, `workshop.txt`) while filtering only the Contents folder
+5. **Temporary folder**: Uses a temporary filtered folder for the upload
+6. **Restores original**: Restores original description and folder paths after upload completes
+7. **Cleanup**: Automatically cleans up temporary files after upload completes
+8. **Preview integration**: Patches the workshop submission screen to show filtered file list
 
 ### Technical Details
 
@@ -113,6 +149,8 @@ ZBetterWorkshopUpload uses [ZombieBuddy](https://github.com/zed-0xff/ZombieBuddy
 - **Lua integration**: Exposes Java functionality to Lua for the preview UI
 - **Pattern matching**: Supports wildcard patterns for flexible file exclusion
 - **Caching**: Caches `.workshopignore` file contents for performance
+- **Reflection**: Uses reflection to modify `SteamWorkshopItem` fields for filtered uploads
+- **Thread-local storage**: Uses ThreadLocal to track and restore original values per upload
 
 ## Building
 
@@ -139,16 +177,17 @@ ZBetterWorkshopUpload/
 │       │   └── client/
 │       │       ├── build.gradle
 │       │       ├── src/
-│       │       │   ├── Main.java
-│       │       │   ├── ZBetterWorkshopUpload.java
-│       │       │   └── WorkshopContentFilter.java
+│       │       │   ├── Main.java                    # Patch definitions and entry point
+│       │       │   ├── ZBetterWorkshopUpload.java    # Lua-exposed API
+│       │       │   ├── WorkshopContentFilter.java   # File filtering logic
+│       │       │   └── DescriptionIncludeProcessor.java  # @include() processing
 │       │       └── build/
 │       │           └── libs/
 │       │               └── client.jar
 │       └── lua/
 │           └── client/
-│               ├── ZBetterWorkshopUpload.lua
-│               └── ZBetterWorkshopUploadOptions.lua
+│               ├── ZBetterWorkshopUpload.lua         # Preview UI integration
+│               └── ZBetterWorkshopUploadOptions.lua  # Mod options UI
 ├── common/
 ├── LICENSE.txt
 └── README.md
@@ -173,6 +212,14 @@ ZBetterWorkshopUpload/
 - Check your exclusion patterns in mod options
 - Verify `.workshopignore` file syntax (if using)
 - Ensure patterns match the file paths correctly (use wildcards if needed)
+- Note: Only files in the `Contents` folder are filtered. Files in the workshop root (like `preview.png`, `workshop.txt`) are always included
+
+### Description includes not working
+
+- Ensure the include file exists in the workshop folder root
+- Check that the file path doesn't contain `..` or absolute paths (these are blocked for security)
+- Verify the file is readable and contains valid UTF-8 text
+- Check the game console for error messages about missing include files
 
 ### Mod not working
 
