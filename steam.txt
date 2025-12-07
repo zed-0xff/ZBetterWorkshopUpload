@@ -9,6 +9,7 @@ Automatically filters unwanted files from Steam Workshop uploads and provides up
 [*] [code].workshopignore[/code] file support (similar to .gitignore)
 [*] Description [code]@include()[/code] directives for easier description management
 [*] Preview of files that will be uploaded before submission
+[*] Sorted workshop items list (alphabetically by folder name)
 [/list]
 
 [b]What it does:[/b]

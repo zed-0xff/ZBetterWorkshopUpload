@@ -17,6 +17,7 @@ ZBetterWorkshopUpload automatically filters out unwanted files (like `.git`, `.D
 - ✅ **Automatic file filtering**: Excludes common unwanted files by default (`.git`, `.DS_Store`, `.gradle`, `.idea`, `.vscode`, logs, temp files, etc.)
 - ✅ **Configurable exclusion patterns**: Customize which files to exclude via mod options
 - ✅ **Preview before upload**: See exactly which files will be uploaded in the workshop submission screen
+- ✅ **Sorted workshop items list**: Workshop items list is sorted alphabetically by folder name for easier browsing
 - ✅ **`.workshopignore` support**: Create `.workshopignore` files in your mod directories (similar to `.gitignore`) for project-specific exclusions
 - ✅ **Recursive ignore files**: `.workshopignore` files are checked recursively up the directory tree
 - ✅ **Comment support**: `.workshopignore` files support comments (lines starting with `#`) and empty lines
