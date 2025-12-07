@@ -123,7 +123,6 @@ public class WorkshopContentFilter {
     }
     
     private static class FilteredFolderInfo {
-        String originalContentFolder;
         String filteredWorkshopFolder;
     }
     
@@ -403,12 +402,12 @@ public class WorkshopContentFilter {
                 return;
             }
             
-            // Get original content folder (before filtering)
-            String originalFolder = getOriginalContentFolder(steamWorkshopItem);
-            System.out.println("[ZBetterWorkshopUpload] Original content folder: " + originalFolder);
+            // Get original workshop folder (before filtering)
+            String originalWorkshopFolder = getOriginalWorkshopFolder(steamWorkshopItem);
+            System.out.println("[ZBetterWorkshopUpload] Original workshop folder: " + originalWorkshopFolder);
             
-            // Create filtered copy
-            String filteredFolder = createFilteredCopy(originalFolder);
+            // Create filtered copy of entire workshop folder
+            String filteredFolder = createFilteredCopy(originalWorkshopFolder);
             if (filteredFolder == null) {
                 System.out.println("[ZBetterWorkshopUpload] Failed to create filtered copy, using original");
                 return;
@@ -417,7 +416,6 @@ public class WorkshopContentFilter {
             // Store info for cleanup (keyed by item ID)
             FilteredFolderInfo info = new FilteredFolderInfo();
             info.filteredWorkshopFolder = filteredFolder;
-            info.originalContentFolder = originalFolder;
             
             // Store for cleanup after upload completes
             synchronized (filteredFoldersByItemId) {
@@ -473,20 +471,20 @@ public class WorkshopContentFilter {
     }
     
     /**
-     * Gets the original content folder path without filtering.
+     * Gets the original workshop folder path without filtering.
      * 
      * @param steamWorkshopItem The workshop item
-     * @return Original content folder path
+     * @return Original workshop folder path
      */
-    private static String getOriginalContentFolder(SteamWorkshopItem steamWorkshopItem) {
+    private static String getOriginalWorkshopFolder(SteamWorkshopItem steamWorkshopItem) {
         try {
             Field workshopFolderField = SteamWorkshopItem.class.getDeclaredField("workshopFolder");
             workshopFolderField.setAccessible(true);
-            String workshopFolder = (String) workshopFolderField.get(steamWorkshopItem);
-            return workshopFolder + File.separator + "Contents";
+            return (String) workshopFolderField.get(steamWorkshopItem);
         } catch (Exception e) {
-            // Fallback to calling getContentFolder (but this might return filtered if in context)
-            return steamWorkshopItem.getContentFolder();
+            // Fallback: get Content folder and go up one level
+            String contentFolder = steamWorkshopItem.getContentFolder();
+            return new File(contentFolder).getParent();
         }
     }
     
@@ -524,20 +522,25 @@ public class WorkshopContentFilter {
         }
     }
     
-    private static String createFilteredCopy(String sourceContentFolder) {
+    /**
+     * Creates a filtered copy of the entire workshop folder.
+     * Copies all files and folders from the workshop folder, but applies filtering
+     * only to the Contents subfolder.
+     * 
+     * @param sourceWorkshopFolder The source workshop folder path
+     * @return The filtered Contents folder path (for compatibility with existing code)
+     */
+    private static String createFilteredCopy(String sourceWorkshopFolder) {
         try {
-            File sourceDir = new File(sourceContentFolder);
-            if (!sourceDir.exists() || !sourceDir.isDirectory()) {
-                System.err.println("[ZBetterWorkshopUpload] Source folder does not exist: " + sourceContentFolder);
+            File sourceWorkshopDir = new File(sourceWorkshopFolder);
+            if (!sourceWorkshopDir.exists() || !sourceWorkshopDir.isDirectory()) {
+                System.err.println("[ZBetterWorkshopUpload] Source workshop folder does not exist: " + sourceWorkshopFolder);
                 return null;
             }
             
             // Create temp directory for filtered copy
             File tempDir = Files.createTempDirectory("zb_workshop_filtered_").toFile();
-            File filteredContentDir = new File(tempDir, "Contents");
-            filteredContentDir.mkdirs();
-            
-            System.out.println("[ZBetterWorkshopUpload] Creating filtered copy in: " + filteredContentDir.getAbsolutePath());
+            System.out.println("[ZBetterWorkshopUpload] Creating filtered copy in: " + tempDir.getAbsolutePath());
             
             // Copy files with filtering
             ensurePatternsLoaded();
@@ -546,20 +549,56 @@ public class WorkshopContentFilter {
                 patterns = new HashSet<>(EXCLUDED_PATTERNS);
             }
             
-            FileFilter filter = new FileFilter() {
+            // Counter to track kept and removed items in Contents folder
+            int[] keptCount = new int[1]; // Use array to allow modification in nested class
+            int[] removedCount = new int[1];
+            
+            // FileFilter for Contents folder - applies filtering
+            FileFilter contentsFilter = new FileFilter() {
                 @Override
                 public boolean accept(File pathname) {
                     // Use shouldIncludePath which checks both global patterns and local ignore files
                     // pathname is already absolute, so we need to get relative path for matching
+                    File sourceContentsDir = new File(sourceWorkshopDir, "Contents");
                     String absolutePath = pathname.getAbsolutePath();
-                    String relativePath = sourceDir.toPath().relativize(pathname.toPath()).toString().replace("\\", "/");
-                    return shouldIncludePath(relativePath, sourceDir.getAbsolutePath());
+                    String relativePath = sourceContentsDir.toPath().relativize(pathname.toPath()).toString().replace("\\", "/");
+                    boolean shouldInclude = shouldIncludePath(relativePath, sourceContentsDir.getAbsolutePath());
+                    
+                    if (shouldInclude) {
+                        keptCount[0]++;
+                    } else {
+                        removedCount[0]++;
+                    }
+                    
+                    return shouldInclude;
                 }
             };
             
-            copyDirectoryFiltered(sourceDir, filteredContentDir, filter);
+            // Copy all files and folders from workshop folder
+            File[] files = sourceWorkshopDir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    File destFile = new File(tempDir, file.getName());
+                    
+                    if (file.isDirectory()) {
+                        if ("Contents".equals(file.getName())) {
+                            // Apply filtering to Contents folder
+                            File filteredContentsDir = new File(tempDir, "Contents");
+                            filteredContentsDir.mkdirs();
+                            copyDirectoryFiltered(file, filteredContentsDir, contentsFilter);
+                        } else {
+                            // Copy other directories without filtering
+                            copyDirectoryUnfiltered(file, destFile);
+                        }
+                    } else {
+                        // Copy files (like preview.png, workshop.txt) without filtering
+                        copyFile(file, destFile);
+                    }
+                }
+            }
             
-            System.out.println("[ZBetterWorkshopUpload] Filtered copy created successfully");
+            File filteredContentDir = new File(tempDir, "Contents");
+            System.out.println("[ZBetterWorkshopUpload] Filtered copy created successfully - kept " + keptCount[0] + " items, removed " + removedCount[0] + " items from Contents");
             return filteredContentDir.getAbsolutePath();
         } catch (Exception e) {
             System.err.println("[ZBetterWorkshopUpload] Failed to create filtered copy: " + e.getMessage());
@@ -583,6 +622,35 @@ public class WorkshopContentFilter {
                 File destFile = new File(destDir, file.getName());
                 if (file.isDirectory()) {
                     copyDirectoryFiltered(file, destFile, filter);
+                } else {
+                    copyFile(file, destFile);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Copies a directory and all its contents without filtering.
+     * 
+     * @param sourceDir The source directory
+     * @param destDir The destination directory
+     * @throws IOException If an I/O error occurs
+     */
+    private static void copyDirectoryUnfiltered(File sourceDir, File destDir) throws IOException {
+        if (!sourceDir.isDirectory()) {
+            return;
+        }
+        
+        if (!destDir.exists()) {
+            destDir.mkdirs();
+        }
+        
+        File[] files = sourceDir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                File destFile = new File(destDir, file.getName());
+                if (file.isDirectory()) {
+                    copyDirectoryUnfiltered(file, destFile);
                 } else {
                     copyFile(file, destFile);
                 }
