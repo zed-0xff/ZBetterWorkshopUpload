@@ -2,8 +2,6 @@ name=ZBetterWorkshopUpload
 id=ZBetterWorkshopUpload
 author=zed-0xff
 url=https://github.com/zed-0xff
-poster=poster.png
-icon=modIcon.png
 
 require=\ZombieBuddy
 javaJarFile=media/java/client/build/libs/client.jar
