@@ -1,11 +1,20 @@
 require "OptionScreens/WorkshopSubmitScreen"
 require "ZBetterWorkshopUploadOptions"
 
+-- page1 - "Choose item directory"
 -- page5 - "Prepare to publish item" with "Upload item to workshop now!" button
 
 local orig_create = WorkshopSubmitScreen.create
 function WorkshopSubmitScreen:create()
     orig_create(self)
+
+    local padY = 64
+
+    local page1 = self.page1
+    if page1 and page1.listbox then
+        -- make listbox bigger
+        page1.listbox:setHeight(self:getHeight() - page1.listbox:getY() - padY)
+    end
 
     local page5 = self.page5
     local text1 = getText("UI_WorkshopSubmit_ItemTitle")
@@ -72,7 +81,6 @@ function WorkshopSubmitScreen:create()
     end
 
     local padX = 96
-    local padY = 64
     local spanX = 8
 
     page5.label1:setX(padX)
