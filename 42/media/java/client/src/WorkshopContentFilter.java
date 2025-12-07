@@ -130,17 +130,18 @@ public class WorkshopContentFilter {
     /**
      * Filters a list of file paths, removing entries that match exclusion patterns.
      * 
-     * @param filePaths The list of file paths to filter
+     * @param filePaths The list of file paths to filter (relative to basePath)
+     * @param basePath The base content folder path (absolute) for resolving relative paths
      * @return A new ArrayList containing only the paths that don't match exclusion patterns
      */
-    public static ArrayList<String> filterFilePaths(ArrayList<String> filePaths) {
+    public static ArrayList<String> filterFilePaths(ArrayList<String> filePaths, String basePath) {
         ArrayList<String> filtered = new ArrayList<>();
         if (filePaths == null) {
             return filtered;
         }
         
         for (String filePath : filePaths) {
-            if (shouldIncludePath(filePath)) {
+            if (shouldIncludePath(filePath, basePath)) {
                 filtered.add(filePath);
             }
         }
@@ -149,12 +150,24 @@ public class WorkshopContentFilter {
     }
     
     /**
+     * Filters a list of file paths, removing entries that match exclusion patterns.
+     * Legacy overload without basePath - uses relative path resolution (may not work correctly for ignore files).
+     * 
+     * @param filePaths The list of file paths to filter
+     * @return A new ArrayList containing only the paths that don't match exclusion patterns
+     */
+    public static ArrayList<String> filterFilePaths(ArrayList<String> filePaths) {
+        return filterFilePaths(filePaths, null);
+    }
+    
+    /**
      * Checks if a file path should be included (doesn't match exclusion patterns).
      * 
-     * @param filePath The file path to check
+     * @param filePath The file path to check (relative to basePath)
+     * @param basePath The base content folder path (absolute) for resolving relative paths
      * @return true if the path should be included, false if it matches an exclusion pattern
      */
-    public static boolean shouldIncludePath(String filePath) {
+    public static boolean shouldIncludePath(String filePath, String basePath) {
         if (filePath == null || filePath.isEmpty()) {
             return false;
         }
@@ -178,8 +191,15 @@ public class WorkshopContentFilter {
         }
         
         // Check against local ignore files (recursive from file's directory up to root)
-        File file = new File(filePath);
-        File dir = file.isDirectory() ? file : file.getParentFile();
+        // Resolve relative path to absolute path using basePath
+        File absoluteFile;
+        if (basePath != null && !basePath.isEmpty()) {
+            absoluteFile = new File(basePath, filePath);
+        } else {
+            absoluteFile = new File(filePath);
+        }
+        
+        File dir = absoluteFile.isDirectory() ? absoluteFile : absoluteFile.getParentFile();
         if (dir != null) {
             List<String> localPatterns = getIgnorePatternsForPath(dir);
             for (String pattern : localPatterns) {
@@ -530,8 +550,10 @@ public class WorkshopContentFilter {
                 @Override
                 public boolean accept(File pathname) {
                     // Use shouldIncludePath which checks both global patterns and local ignore files
-                    String filePath = pathname.getAbsolutePath();
-                    return shouldIncludePath(filePath);
+                    // pathname is already absolute, so we need to get relative path for matching
+                    String absolutePath = pathname.getAbsolutePath();
+                    String relativePath = sourceDir.toPath().relativize(pathname.toPath()).toString().replace("\\", "/");
+                    return shouldIncludePath(relativePath, sourceDir.getAbsolutePath());
                 }
             };
             

@@ -39,8 +39,8 @@ public class ZBetterWorkshopUpload {
             filenames.add(relativePath);
         }
         
-        // Filter using exclusion patterns
-        return WorkshopContentFilter.filterFilePaths(filenames);
+        // Filter using exclusion patterns - pass content folder for ignore file resolution
+        return WorkshopContentFilter.filterFilePaths(filenames, contentFolder.getAbsolutePath());
     }
     
     /**
