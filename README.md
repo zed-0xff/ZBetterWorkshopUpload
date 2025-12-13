@@ -230,8 +230,8 @@ ZBetterWorkshopUpload/
 
 ## Links
 
-- **GitHub**: https://github.com/zed-0xff/ZBetterWorkshopUpload
-- **ZombieBuddy Framework**: [ZombieBuddy](https://github.com/zed-0xff/ZombieBuddy) - The framework this mod is built on
+- **GitHub Repository**: https://github.com/zed-0xff/ZBetterWorkshopUpload
+- **ZombieBuddy Framework**: https://github.com/zed-0xff/ZombieBuddy - The framework this mod is built on
 
 ## Related Mods
 
@@ -239,6 +239,7 @@ Other mods built with ZombieBuddy:
 
 - **[ZBHelloWorld](https://github.com/zed-0xff/ZBHelloWorld)**: A simple example mod demonstrating patches-only mods and UI patching
 - **[ZBMacOSHideMenuBar](https://github.com/zed-0xff/ZBMacOSHideMenuBar)**: Fixes the macOS menu bar issue in borderless windowed mode
+- **[ZBBetterFPS](https://github.com/zed-0xff/ZBBetterFPS)**: Optimizes FPS by reducing render distance
 
 ## License
 

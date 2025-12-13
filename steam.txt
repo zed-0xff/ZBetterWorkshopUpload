@@ -20,6 +20,7 @@ Filters out unwanted files when uploading mods to Steam Workshop. Only files in 
 
 [b]Links:[/b]
 [url=https://github.com/zed-0xff/ZBetterWorkshopUpload]GitHub Repository[/url]
+[url=https://github.com/zed-0xff/ZombieBuddy]ZombieBuddy[/url] - Required framework
 
 [b]☕ Support the Developer:[/b]
 [url=https://ko-fi.com/zed_0xff][img]https://i.imgur.com/Utx6OIH.png[/img][/url]
