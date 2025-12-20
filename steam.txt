@@ -16,7 +16,7 @@ Automatically filters unwanted files from Steam Workshop uploads and provides up
 Filters out unwanted files when uploading mods to Steam Workshop. Only files in the Contents folder are filtered - root files like preview.png are always included. Supports both global exclusion patterns and project-specific .workshopignore files.
 
 [b]Requirements:[/b]
-[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3378285185]ZombieBuddy[/url] - Required framework
+[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3619862853]ZombieBuddy[/url] - Required framework
 
 [b]Links:[/b]
 [url=https://github.com/zed-0xff/ZBetterWorkshopUpload]GitHub Repository[/url]
