@@ -1,6 +1,5 @@
 package me.zed_0xff.zbetter_workshop_upload;
 
-import me.zed_0xff.zombie_buddy.Exposer;
 import me.zed_0xff.zombie_buddy.Patch;
 
 import java.io.File;
@@ -11,10 +10,6 @@ import java.util.Collections;
 import zombie.core.znet.SteamWorkshopItem;
 
 public class Main {
-    public static void main(String[] args) {
-        Exposer.exposeClassToLua(ZBetterWorkshopUpload.class);
-    }
-
     @Patch(className = "zombie.core.znet.SteamWorkshop", methodName = "SubmitWorkshopItem")
     public class Patch_SubmitWorkshopItem {
         // Thread-local to store original workshopFolder value for restoration

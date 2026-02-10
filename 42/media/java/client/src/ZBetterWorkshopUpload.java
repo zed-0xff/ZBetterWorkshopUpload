@@ -9,6 +9,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import me.zed_0xff.zombie_buddy.Exposer;
+
+@Exposer.LuaClass
 public class ZBetterWorkshopUpload {
     /**
      * Gets filtered contents of a workshop item.

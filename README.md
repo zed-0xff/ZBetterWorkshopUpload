@@ -237,6 +237,7 @@ ZBetterWorkshopUpload/
 
 Other mods built with ZombieBuddy:
 
+- **[ZBLuaPerfMon](https://github.com/zed-0xff/ZBLuaPerfMon)**: Real-time Lua performance monitoring and OSD
 - **[ZBHelloWorld](https://github.com/zed-0xff/ZBHelloWorld)**: A simple example mod demonstrating patches-only mods and UI patching
 - **[ZBMacOSHideMenuBar](https://github.com/zed-0xff/ZBMacOSHideMenuBar)**: Fixes the macOS menu bar issue in borderless windowed mode
 - **[ZBBetterFPS](https://github.com/zed-0xff/ZBBetterFPS)**: Optimizes FPS by reducing render distance
