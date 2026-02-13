@@ -443,12 +443,12 @@ public class WorkshopContentFilter {
     }
     
     /**
-     * Gets the filtered content folder if we're in SubmitWorkshopItem context for this item.
+     * Gets the filtered workshop folder if we're in SubmitWorkshopItem context for this item.
      * 
      * @param steamWorkshopItem The workshop item
      * @return Filtered folder path, or null if not in context or no filtered folder exists
      */
-    public static String getFilteredContentFolder(SteamWorkshopItem steamWorkshopItem) {
+    public static String getFilteredWorkshopFolder(SteamWorkshopItem steamWorkshopItem) {
         SteamWorkshopItem contextItem = submitContext.get();
         if (contextItem != steamWorkshopItem) {
             // Not in SubmitWorkshopItem context for this item

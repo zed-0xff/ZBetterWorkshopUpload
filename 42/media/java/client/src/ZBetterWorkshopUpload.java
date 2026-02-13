@@ -40,7 +40,7 @@ public class ZBetterWorkshopUpload {
     }
 
     /**
-     * Gets filtered contents of a workshop item.
+     * Gets filtered contents of a workshop item - called from LUA
      * 
      * @param workshopItem The workshop item to get contents for
      * @return ArrayList of filtered file paths (relative to content folder)

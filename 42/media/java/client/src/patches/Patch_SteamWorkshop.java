@@ -16,7 +16,7 @@ public class Patch_SteamWorkshop {
         @Patch.OnExit
         public static void afterSubmitWorkshopItem() {
             WorkshopContentFilter.exitSubmitContext();
-            WorkshopContentFilter.cleanupAllPendingFolders();
+            // XXX do not cleanup yet, upload is async!
         }
     }    
     
@@ -33,6 +33,22 @@ public class Patch_SteamWorkshop {
     public static class Patch_onItemNotUpdated {
         @Patch.OnEnter
         public static void beforeOnItemNotUpdated() {
+            WorkshopContentFilter.cleanupAllPendingFolders();
+        }
+    }
+
+    @Patch(className = "zombie.core.znet.SteamWorkshop", methodName = "onItemCreated")
+    public static class Patch_onItemCreated {
+        @Patch.OnEnter
+        public static void beforeOnItemCreated() {
+            WorkshopContentFilter.cleanupAllPendingFolders();
+        }
+    }
+    
+    @Patch(className = "zombie.core.znet.SteamWorkshop", methodName = "onItemNotCreated")
+    public static class Patch_onItemNotCreated {
+        @Patch.OnEnter
+        public static void beforeOnItemNotCreated() {
             WorkshopContentFilter.cleanupAllPendingFolders();
         }
     }
