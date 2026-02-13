@@ -24,26 +24,29 @@ public class ZBetterWorkshopUpload {
         if (!contentFolder.exists() || !contentFolder.isDirectory()) {
             return new ArrayList<>();
         }
+
+        String basePathStr = contentFolder.getAbsolutePath();
+        Path basePath = Paths.get(basePathStr);
         
         // Get all files recursively
-        File[] allFiles = ZomboidFileSystem.listAllFiles(contentFolder, new FileFilter() {
+        File[] filteredFiles = ZomboidFileSystem.listAllFiles(contentFolder, new FileFilter() {
             @Override
-            public boolean accept(File pathname) {
-                return true;
+            public boolean accept(File file) {
+                Path filePath = Paths.get(file.getAbsolutePath());
+                String relativePath = basePath.relativize(filePath).toString().replace("\\", "/");
+                return WorkshopContentFilter.shouldIncludePath(relativePath, basePathStr);
             }
         }, true);
         
         // Convert to relative paths
         ArrayList<String> filenames = new ArrayList<>();
-        Path basePath = Paths.get(contentFolder.getAbsolutePath());
-        for (File file : allFiles) {
+        for (File file : filteredFiles) {
             Path filePath = Paths.get(file.getAbsolutePath());
             String relativePath = basePath.relativize(filePath).toString().replace("\\", "/");
             filenames.add(relativePath);
         }
         
-        // Filter using exclusion patterns - pass content folder for ignore file resolution
-        return WorkshopContentFilter.filterFilePaths(filenames, contentFolder.getAbsolutePath());
+        return filenames;
     }
     
     /**
