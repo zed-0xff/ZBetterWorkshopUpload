@@ -1,5 +1,7 @@
 package me.zed_0xff.zbetter_workshop_upload;
 
+import me.zed_0xff.zombie_buddy.Accessor;
+
 import zombie.core.znet.SteamWorkshopItem;
 
 import java.io.BufferedReader;
@@ -67,10 +69,7 @@ public class WorkshopContentFilter {
                     }
                 }
             } else {
-                // Use defaults if no configuration
-                for (String pattern : DEFAULT_PATTERNS) {
-                    EXCLUDED_PATTERNS.add(pattern);
-                }
+                addDefaultPatterns();
             }
             
             patternsLoaded = true;
@@ -112,13 +111,16 @@ public class WorkshopContentFilter {
         if (!patternsLoaded) {
             synchronized (EXCLUDED_PATTERNS) {
                 if (!patternsLoaded) {
-                    // Use defaults if not loaded from mod options
-                    for (String pattern : DEFAULT_PATTERNS) {
-                        EXCLUDED_PATTERNS.add(pattern);
-                    }
+                    addDefaultPatterns();
                     patternsLoaded = true;
                 }
             }
+        }
+    }
+
+    private static void addDefaultPatterns() {
+        for (String pattern : DEFAULT_PATTERNS) {
+            EXCLUDED_PATTERNS.add(pattern);
         }
     }
     
@@ -403,7 +405,7 @@ public class WorkshopContentFilter {
             }
             
             // Get original workshop folder (before filtering)
-            String originalWorkshopFolder = getOriginalWorkshopFolder(steamWorkshopItem);
+            String originalWorkshopFolder = getWorkshopFolderPath(steamWorkshopItem);
             System.out.println("[ZBetterWorkshopUpload] Original workshop folder: " + originalWorkshopFolder);
             
             // Create filtered copy of entire workshop folder
@@ -471,21 +473,14 @@ public class WorkshopContentFilter {
     }
     
     /**
-     * Gets the original workshop folder path without filtering.
-     * 
+     * Gets the workshop folder path for a SteamWorkshopItem.
+     * Single place for reflection/fallback so callers stay DRY.
+     *
      * @param steamWorkshopItem The workshop item
-     * @return Original workshop folder path
+     * @return Workshop folder path
      */
-    private static String getOriginalWorkshopFolder(SteamWorkshopItem steamWorkshopItem) {
-        try {
-            Field workshopFolderField = SteamWorkshopItem.class.getDeclaredField("workshopFolder");
-            workshopFolderField.setAccessible(true);
-            return (String) workshopFolderField.get(steamWorkshopItem);
-        } catch (Exception e) {
-            // Fallback: get Content folder and go up one level
-            String contentFolder = steamWorkshopItem.getContentFolder();
-            return new File(contentFolder).getParent();
-        }
+    public static String getWorkshopFolderPath(SteamWorkshopItem steamWorkshopItem) {
+        return Accessor.tryGet(steamWorkshopItem, "workshopFolder", null);
     }
     
     /**

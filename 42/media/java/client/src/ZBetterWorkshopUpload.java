@@ -1,7 +1,6 @@
 package me.zed_0xff.zbetter_workshop_upload;
 
 import zombie.core.znet.SteamWorkshopItem;
-import zombie.ZomboidFileSystem;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -13,6 +12,33 @@ import me.zed_0xff.zombie_buddy.Exposer;
 
 @Exposer.LuaClass
 public class ZBetterWorkshopUpload {
+
+    public static File[] listAllFiles(File file, FileFilter fileFilter, boolean z) {
+        if (file == null || !file.isDirectory()) {
+            return new File[0];
+        }
+        ArrayList arrayList = new ArrayList();
+        listAllFilesInternal(file, fileFilter, z, arrayList);
+        return (File[]) arrayList.toArray(new File[0]);
+    }
+
+    // copied from ZomboidFileSystem.java because the original method does not call fileFilter.accept() for directories
+    private static void listAllFilesInternal(File file, FileFilter fileFilter, boolean z, ArrayList<File> arrayList) {
+        File[] fileArrListFiles = file.listFiles();
+        if (fileArrListFiles == null) {
+            return;
+        }
+        for (File file2 : fileArrListFiles) {
+            if (fileFilter.accept(file2)) {
+                if (file2.isFile()) {
+                    arrayList.add(file2);
+                } else if (file2.isDirectory() && z) {
+                    listAllFilesInternal(file2, fileFilter, true, arrayList);
+                }
+            }
+        }
+    }
+
     /**
      * Gets filtered contents of a workshop item.
      * 
@@ -29,7 +55,7 @@ public class ZBetterWorkshopUpload {
         Path basePath = Paths.get(basePathStr);
         
         // Get all files recursively
-        File[] filteredFiles = ZomboidFileSystem.listAllFiles(contentFolder, new FileFilter() {
+        File[] filteredFiles = listAllFiles(contentFolder, new FileFilter() {
             @Override
             public boolean accept(File file) {
                 Path filePath = Paths.get(file.getAbsolutePath());

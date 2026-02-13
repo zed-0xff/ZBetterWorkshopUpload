@@ -23,8 +23,7 @@ public class DescriptionIncludeProcessor {
             return description;
         }
         
-        // Get workshop folder using reflection (same as WorkshopContentFilter)
-        String workshopFolderPath = getWorkshopFolderPath(workshopItem);
+        String workshopFolderPath = WorkshopContentFilter.getWorkshopFolderPath(workshopItem);
         
         // Split description into lines and process each line
         String[] lines = description.split("\r?\n", -1);
@@ -58,19 +57,6 @@ public class DescriptionIncludeProcessor {
         }
         
         return result.toString();
-    }
-    
-    /**
-     * Gets the workshop folder path from a SteamWorkshopItem.
-     * Uses getContentFolder() and gets its parent directory.
-     * 
-     * @param workshopItem The workshop item
-     * @return The workshop folder path
-     */
-    private static String getWorkshopFolderPath(SteamWorkshopItem workshopItem) {
-        // getContentFolder() returns workshopFolder + File.separator + "Contents"
-        // So we get the parent to get the workshop folder
-        return new File(workshopItem.getContentFolder()).getParent();
     }
     
     /**
