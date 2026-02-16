@@ -1,6 +1,29 @@
 require "OptionScreens/WorkshopSubmitScreen"
 require "ZBetterWorkshopUploadOptions"
 
+-- Colors for file list by extension (r, g, b, a in 0–1)
+local COLOR_IMAGE   = { 0.35, 0.85, 0.4,  0.95 }
+local COLOR_TEXT    = { 1.0,  1.0,  1.0,  0.95 }
+local COLOR_LUA     = { 0.3,  0.85, 0.9,  0.95 }
+local COLOR_JAVA    = { 0.4,  0.6,  1.0,  0.95 }
+local COLOR_JAR     = { 1.0,  0.55, 0.25, 0.95 }
+local DEFAULT_COLOR = { 0.55, 0.55, 0.55, 0.95 }
+
+local FILE_COLORS = {}
+for _, ext in ipairs({ "png", "jpg", "gif" }) do FILE_COLORS[ext] = COLOR_IMAGE end
+for _, ext in ipairs({ "txt", "md", "info" }) do FILE_COLORS[ext] = COLOR_TEXT end
+FILE_COLORS.lua = COLOR_LUA
+FILE_COLORS.java = COLOR_JAVA
+FILE_COLORS.jar = COLOR_JAR
+
+local function colorForPath(path)
+    if not path or path == "" then return DEFAULT_COLOR end
+    local ext = path:match("%.(%w+)$")
+    if not ext then return DEFAULT_COLOR end
+    ext = ext:lower()
+    return FILE_COLORS[ext] or DEFAULT_COLOR
+end
+
 -- page1 - "Choose item directory"
 -- page5 - "Prepare to publish item" with "Upload item to workshop now!" button
 
@@ -40,44 +63,12 @@ function WorkshopSubmitScreen:create()
         -- end
     end
 
-    if not page5.label1 then
-        print "[ZBetterWorkshopUpload] Could not find label1"
-        return
-    end
-
-    if not page5.label4 then
-        print "[ZBetterWorkshopUpload] Could not find label4"
-        return
-    end
-
-    if not page5.label5 then
-        print "[ZBetterWorkshopUpload] Could not find label5"
-        return
-    end
-
-    if not page5.label6 then
-        print "[ZBetterWorkshopUpload] Could not find label6"
-        return
-    end
-
-    if not page5.titleEntry then
-        print "[ZBetterWorkshopUpload] Could not find titleEntry"
-        return
-    end
-
-    if not page5.IDEntry then
-        print "[ZBetterWorkshopUpload] Could not find IDEntry"
-        return
-    end
-
-    if not page5.button1 then
-        print "[ZBetterWorkshopUpload] Could not find button1"
-        return
-    end
-
-    if not page5.button2 then
-        print "[ZBetterWorkshopUpload] Could not find button2"
-        return
+    local required = { "label1", "label4", "label5", "label6", "titleEntry", "IDEntry", "button1", "button2" }
+    for _, key in ipairs(required) do
+        if not page5[key] then
+            print("[ZBetterWorkshopUpload] Could not find " .. key)
+            return
+        end
     end
 
     local padX = 96
@@ -135,7 +126,10 @@ function WorkshopSubmitScreen:create()
             local fileList = ZBetterWorkshopUpload.getWorkshopItemFilteredContents(workshopItem)
             if fileList and fileList:size()>0 then
                 for i=0,fileList:size()-1 do
-                    page5.listbox:addItem(fileList:get(i))
+                    local path = fileList:get(i)
+                    page5.listbox:addItem(path)
+                    local c = colorForPath(path)
+                    page5.listbox:setItemTextColorRGBA(page5.listbox:size(), c[1], c[2], c[3], c[4])
                 end
             end
         else
