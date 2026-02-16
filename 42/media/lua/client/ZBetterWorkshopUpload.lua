@@ -31,6 +31,7 @@ local orig_create = WorkshopSubmitScreen.create
 function WorkshopSubmitScreen:create()
     orig_create(self)
 
+    local spanX = 8
     local padY = 64
 
     local page1 = self.page1
@@ -38,6 +39,27 @@ function WorkshopSubmitScreen:create()
         -- make listbox bigger
         page1.listbox:setHeight(self:getHeight() - page1.listbox:getY() - padY)
     end
+
+    -- move 'Workshop' folder to the top
+    local text1 = getText("UI_WorkshopSubmit_ContentFolder")
+    local text2 = Core.getMyDocumentFolder() .. getFileSeparator() .. "Workshop"
+    for id, child in pairs(self.page1.children) do
+        if child.Type == "ISLabel" then
+            if child:getName() == text1 then
+                page1.label1 = child
+            elseif child:getName() == text2 then
+                page1.label2 = child
+            end
+        end
+    end
+
+    if page1.label1 and page1.label2 then
+        page1.label2:setX(page1.label1:getRight() + spanX)
+        page1.label2:setY(page1.label1:getY())
+        page1.label2:setColor(COLOR_LUA[1], COLOR_LUA[2], COLOR_LUA[3])
+    end
+
+    --- page5
 
     local page5 = self.page5
     local text1 = getText("UI_WorkshopSubmit_ItemTitle")
@@ -72,7 +94,6 @@ function WorkshopSubmitScreen:create()
     end
 
     local padX = 96
-    local spanX = 8
 
     page5.label1:setX(padX)
     page5.label1:setY(64)
@@ -124,12 +145,18 @@ function WorkshopSubmitScreen:create()
         if ZBetterWorkshopUpload and ZBetterWorkshopUpload.getWorkshopItemFilteredContents then
             print("[ZBetterWorkshopUpload] Getting workshop item filtered contents for item "..tostring(workshopItem))
             local fileList = ZBetterWorkshopUpload.getWorkshopItemFilteredContents(workshopItem)
-            if fileList and fileList:size()>0 then
-                for i=0,fileList:size()-1 do
-                    local path = fileList:get(i)
+            if fileList and fileList:size() > 0 then
+                local paths = {}
+                for i = 0, fileList:size() - 1 do
+                    paths[#paths + 1] = fileList:get(i)
+                end
+                table.sort(paths)
+                for _, path in ipairs(paths) do
                     page5.listbox:addItem(path)
+                    local idx = page5.listbox:size()
                     local c = colorForPath(path)
-                    page5.listbox:setItemTextColorRGBA(page5.listbox:size(), c[1], c[2], c[3], c[4])
+                    page5.listbox:setItemTextColorRGBA(idx, c[1], c[2], c[3], c[4])
+                    page5.listbox:setItemSelectedTextColorRGBA(idx, c[1], c[2], c[3], c[4])
                 end
             end
         else
