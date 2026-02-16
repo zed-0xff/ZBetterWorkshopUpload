@@ -8,8 +8,9 @@ Automatically filters unwanted files from Steam Workshop uploads and provides up
 [*] Configurable exclusion patterns via mod options
 [*] [code].workshopignore[/code] file support (similar to .gitignore)
 [*] Description [code]@include()[/code] directives for easier description management
-[*] Preview of files that will be uploaded before submission
+[*] Preview of files that will be uploaded before submission (sorted list, colored by type: images, text, Lua, Java, JAR)
 [*] Sorted workshop items list (alphabetically by folder name)
+[*] Escape key goes to previous page or closes to main menu when on the first page
 [/list]
 
 [b]What it does:[/b]
