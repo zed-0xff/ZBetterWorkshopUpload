@@ -24,6 +24,14 @@ local function colorForPath(path)
     return FILE_COLORS[ext] or DEFAULT_COLOR
 end
 
+local function getVisiblePage(screen)
+    for i = 1, 10 do
+        local p = screen["page" .. i]
+        if p and p:isVisible() then return p end
+    end
+    return nil
+end
+
 -- page1 - "Choose item directory"
 -- page5 - "Prepare to publish item" with "Upload item to workshop now!" button
 
@@ -40,7 +48,7 @@ function WorkshopSubmitScreen:create()
         page1.listbox:setHeight(self:getHeight() - page1.listbox:getY() - padY)
     end
 
-    -- move 'Workshop' folder to the top
+    -- move Workshop folder path label to the top & right
     local text1 = getText("UI_WorkshopSubmit_ContentFolder")
     local text2 = Core.getMyDocumentFolder() .. getFileSeparator() .. "Workshop"
     for id, child in pairs(self.page1.children) do
@@ -166,3 +174,24 @@ function WorkshopSubmitScreen:create()
     end
 end
 
+-- Esc: previous page, or close to main menu if on page9. Hook/unhook in setVisible so the listener
+-- is only active while the Workshop Submit screen is visible.
+local function onEscKey(key)
+    if key ~= Keyboard.KEY_ESCAPE then return end
+    local screen = WorkshopSubmitScreen.instance
+    if not screen or not screen:isVisible() then return end
+    local page = getVisiblePage(screen)
+    if page and page.onButtonBack then
+        page:onButtonBack()
+    end
+end
+
+local orig_setVisible = WorkshopSubmitScreen.setVisible
+function WorkshopSubmitScreen:setVisible(visible)
+    orig_setVisible(self, visible)
+    if visible then
+        Events.OnKeyPressed.Add(onEscKey)
+    else
+        Events.OnKeyPressed.Remove(onEscKey)
+    end
+end
