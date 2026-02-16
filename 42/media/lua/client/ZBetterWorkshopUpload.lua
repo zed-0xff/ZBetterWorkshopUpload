@@ -12,12 +12,14 @@ local DEFAULT_COLOR = { 0.55, 0.55, 0.55, 0.95 }
 local FILE_COLORS = {}
 for _, ext in ipairs({ "png", "jpg", "gif" }) do FILE_COLORS[ext] = COLOR_IMAGE end
 for _, ext in ipairs({ "txt", "md", "info" }) do FILE_COLORS[ext] = COLOR_TEXT end
+for _, ext in ipairs({ "java", "gradle", "properties" }) do FILE_COLORS[ext] = COLOR_JAVA end
 FILE_COLORS.lua = COLOR_LUA
-FILE_COLORS.java = COLOR_JAVA
 FILE_COLORS.jar = COLOR_JAR
 
 local function colorForPath(path)
     if not path or path == "" then return DEFAULT_COLOR end
+    local filename = path:match("([^/]+)$") or path
+    if filename:lower() == "license" then return COLOR_TEXT end
     local ext = path:match("%.(%w+)$")
     if not ext then return DEFAULT_COLOR end
     ext = ext:lower()
