@@ -7,6 +7,7 @@ local COLOR_TEXT    = { 1.0,  1.0,  1.0,  0.95 }
 local COLOR_LUA     = { 0.3,  0.85, 0.9,  0.95 }
 local COLOR_JAVA    = { 0.4,  0.6,  1.0,  0.95 }
 local COLOR_JAR     = { 1.0,  0.55, 0.25, 0.95 }
+local COLOR_BINARY  = { 1.0,  0.35, 0.35, 0.95 }
 local DEFAULT_COLOR = { 0.55, 0.55, 0.55, 0.95 }
 
 local FILE_COLORS = {}
@@ -15,6 +16,7 @@ for _, ext in ipairs({ "txt", "md", "info" }) do FILE_COLORS[ext] = COLOR_TEXT e
 for _, ext in ipairs({ "java", "gradle", "properties" }) do FILE_COLORS[ext] = COLOR_JAVA end
 FILE_COLORS.lua = COLOR_LUA
 FILE_COLORS.jar = COLOR_JAR
+for _, ext in ipairs({ "exe", "dll", "dylib", "so", "bat", "cmd", "sh", "ps1" }) do FILE_COLORS[ext] = COLOR_BINARY end
 
 local function colorForPath(path)
     if not path or path == "" then return DEFAULT_COLOR end
@@ -67,6 +69,31 @@ function WorkshopSubmitScreen:create()
         page1.label2:setX(page1.label1:getRight() + spanX)
         page1.label2:setY(page1.label1:getY())
         page1.label2:setColor(COLOR_LUA[1], COLOR_LUA[2], COLOR_LUA[3])
+    end
+
+    -- show mod icons in page1 listbox (override listbox.doDrawItem directly; page1.doDrawItem is copied at create)
+    local iconW = 32
+    local iconPad = 12
+    local textX = 8 + iconW + iconPad  -- align all text (with or without icon)
+    page1.listbox.doDrawItem = function(self, y, item, alt)
+        local workshopItem = item and item.item
+        if workshopItem and workshopItem.getPreviewImage then
+            local imgPath = workshopItem:getPreviewImage()
+            if imgPath and imgPath ~= "" then
+                local tex = getTexture(imgPath)
+                if tex then
+                    local sz = math.min(self.itemheight - 4, iconW)
+                    self:drawTextureScaled(tex, 8, y + (self.itemheight - sz) / 2, sz, sz, 1, 1, 1, 1)
+                end
+            end
+        end
+        self:drawRectBorder(0, y, self:getWidth(), self.itemheight - 1, 0.5, self.borderColor.r, self.borderColor.g, self.borderColor.b)
+        if self.selected == item.index then
+            self:drawRect(0, y, self:getWidth(), self.itemheight - 1, 0.3, 0.7, 0.35, 0.15)
+        end
+        local dy = (self.itemheight - getTextManager():getFontFromEnum(self.font):getLineHeight()) / 2
+        self:drawText(item.text, textX, y + dy, 0.9, 0.9, 0.9, 0.9, self.font)
+        return y + item.height
     end
 
     --- page5
