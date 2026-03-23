@@ -51,7 +51,7 @@ end
 -- page1 - "Choose item directory"
 -- page5 - "Prepare to publish item" with "Upload item to workshop now!" button
 
-zbHook({
+zdk.hook({
     WorkshopSubmitScreen = {
         create = function(orig, self, ...)
             orig(self, ...)
@@ -183,7 +183,7 @@ zbHook({
             page5.listbox.selectionColor = nil  -- Disable red selection highlight
             page5:addChild(page5.listbox)
 
-            zbHook({
+            zdk.hook({
                 [page5] = {
                     setFields = function(orig, self, ...)
                         orig(self, ...)
@@ -226,4 +226,4 @@ zbHook({
             end
         end,
     }, -- WorkshopSubmitScreen
-}) -- zbHook
+}) -- zdk.hook
