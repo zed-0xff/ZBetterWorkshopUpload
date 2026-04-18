@@ -1,6 +1,10 @@
 require "OptionScreens/WorkshopSubmitScreen"
 require "ZBetterWorkshopUploadOptions"
 
+if ZBetterWorkshopUpload and ZBetterWorkshopUpload.clearCache then
+    ZBetterWorkshopUpload.clearCache()
+end
+
 -- Colors for file list by extension (r, g, b, a in 0–1)
 local COLOR_IMAGE   = { 0.35, 0.85, 0.4,  0.95 }
 local COLOR_TEXT    = { 1.0,  1.0,  1.0,  0.95 }

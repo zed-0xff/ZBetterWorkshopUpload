@@ -94,4 +94,8 @@ public class ZBetterWorkshopUpload {
     public static String getDefaultExcludedPatterns() {
         return WorkshopContentFilter.getDefaultPatternsString();
     }
+
+    public static void clearCache() {
+        WorkshopContentFilter.clearIgnoreFileCache();
+    }
 }
