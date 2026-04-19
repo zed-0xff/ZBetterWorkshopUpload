@@ -64,7 +64,7 @@ public class Patch_SteamWorkshopItem {
                     System.out.println("[ZBetterWorkshopUpload] Verified Contents folder exists at " + contentsDir.getAbsolutePath());
                 }
             } else {
-                System.out.println("[ZBetterWorkshopUpload] returning original workshopFolder: " + result);
+                // System.out.println("[ZBetterWorkshopUpload] returning original workshopFolder: " + result);
             }
         }
     }
