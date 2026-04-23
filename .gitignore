@@ -1,6 +1,7 @@
 .gradle
 *.class
 *.jar
+*.jar.zbs
 *.log
 *.tmp
 *.swp
