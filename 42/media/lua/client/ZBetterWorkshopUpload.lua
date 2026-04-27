@@ -11,16 +11,23 @@ local COLOR_TEXT    = { 1.0,  1.0,  1.0,  0.95 }
 local COLOR_LUA     = { 0.3,  0.85, 0.9,  0.95 }
 local COLOR_JAVA    = { 0.4,  0.6,  1.0,  0.95 }
 local COLOR_JAR     = { 1.0,  0.55, 0.25, 0.95 }
-local COLOR_BINARY  = { 1.0,  0.35, 0.35, 0.95 }
+local COLOR_EXE     = { 1.0,  0.35, 0.35, 0.95 }
 local DEFAULT_COLOR = { 0.55, 0.55, 0.55, 0.95 }
 
 local FILE_COLORS = {}
-for _, ext in ipairs({ "png", "jpg", "gif" }) do FILE_COLORS[ext] = COLOR_IMAGE end
-for _, ext in ipairs({ "txt", "md", "info" }) do FILE_COLORS[ext] = COLOR_TEXT end
-for _, ext in ipairs({ "java", "gradle", "properties" }) do FILE_COLORS[ext] = COLOR_JAVA end
-FILE_COLORS.lua = COLOR_LUA
-FILE_COLORS.jar = COLOR_JAR
-for _, ext in ipairs({ "exe", "dll", "dylib", "so", "bat", "cmd", "sh", "ps1" }) do FILE_COLORS[ext] = COLOR_BINARY end
+local function colorize(color, ...)
+    for i = 1, select("#", ...) do
+        local ext = select(i, ...)
+        FILE_COLORS[ext] = color
+    end
+end
+
+colorize(COLOR_IMAGE, "png", "jpg", "gif" )
+colorize(COLOR_TEXT,  "txt", "md", "info", "json" )
+colorize(COLOR_JAVA,  "java", "gradle", "properties" )
+colorize(COLOR_LUA,   "lua" )
+colorize(COLOR_JAR,   "jar", "zbs" )
+colorize(COLOR_EXE,   "exe", "dll", "dylib", "so", "bat", "cmd", "sh", "ps1" )
 
 local function colorForPath(path)
     if not path or path == "" then return DEFAULT_COLOR end
