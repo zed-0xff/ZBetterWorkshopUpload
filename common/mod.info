@@ -6,4 +6,4 @@ url=https://github.com/zed-0xff
 require=\ZombieBuddy,\zdk
 javaJarFile=media/java/client/ZBetterWorkshopUpload.jar
 javaPkgName=me.zed_0xff.zbetter_workshop_upload
-ZBVersionMin=1.6.0
+ZBVersionMin=2.0.0
