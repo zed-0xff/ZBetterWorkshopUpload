@@ -8,7 +8,7 @@ local function getDefaultPatterns()
         return ZBetterWorkshopUpload.getDefaultExcludedPatterns()
     end
     -- Fallback (should match Java defaults, but Java is the source of truth)
-    return ".DS_Store; .git*; .gradle; .idea; .vscode; *.log; *.tmp; *.swp; Thumbs.db; tmp"
+    return ".DS_Store; .classpath; .claude; .cursor; .git*; .gradle; .idea; .project; .settings; .vscode; *.log; *.tmp; *.swp; Thumbs.db; tmp"
 end
 
 -- ------------------------------------------------- --
