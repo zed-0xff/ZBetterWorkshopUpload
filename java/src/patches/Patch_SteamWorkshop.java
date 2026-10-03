@@ -1,6 +1,6 @@
 package me.zed_0xff.zbetter_workshop_upload;
 
-import me.zed_0xff.zombie_buddy.Patch;
+import me.zed_0xff.zombie_buddy.annotations.Patch;
 
 import zombie.core.znet.SteamWorkshopItem;
 

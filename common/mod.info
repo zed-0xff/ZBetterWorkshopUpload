@@ -4,6 +4,12 @@ author=Zed
 url=https://github.com/zed-0xff
 
 require=\ZombieBuddy,\zdk
-javaJarFile=media/java/client/ZBetterWorkshopUpload.jar
+
 javaPkgName=me.zed_0xff.zbetter_workshop_upload
+
+javaJarFile=media/java/client/ZBetterWorkshopUpload-2x.jar
 ZBVersionMin=2.0.0
+ZBVersionMax=2.99.99
+
+javaJarFile1=media/java/client/ZBetterWorkshopUpload.jar
+ZBVersionMin1=3.0.0

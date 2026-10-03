@@ -3,8 +3,6 @@
 .settings
 
 *.class
-*.jar
-*.jar.zbs
 *.log
 *.tmp
 *.swp

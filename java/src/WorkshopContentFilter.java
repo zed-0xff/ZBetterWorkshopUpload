@@ -1,6 +1,6 @@
 package me.zed_0xff.zbetter_workshop_upload;
 
-import me.zed_0xff.zombie_buddy.Accessor;
+import me.zed_0xff.zombie_buddy.Reflect;
 
 import zombie.core.znet.SteamWorkshopItem;
 
@@ -479,7 +479,7 @@ public class WorkshopContentFilter {
      * @return Workshop folder path
      */
     public static String getWorkshopFolderPath(SteamWorkshopItem steamWorkshopItem) {
-        return Accessor.tryGet(steamWorkshopItem, "workshopFolder", null);
+        return Reflect.on(steamWorkshopItem).field("workshopFolder").as(String.class).orElse(null);
     }
     
     /**
