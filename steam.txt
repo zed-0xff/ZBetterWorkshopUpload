@@ -24,5 +24,4 @@ Filters out unwanted files when uploading mods to Steam Workshop. Only files in 
 [url=https://github.com/zed-0xff/ZombieBuddy]ZombieBuddy[/url] - Required framework
 
 [b]☕ Support the Developer:[/b]
-[url=https://ko-fi.com/zed_0xff][img]https://i.imgur.com/Utx6OIH.png[/img][/url]
-
+[url=https://patreon.com/zed_0xff][img]https://cdn.jsdelivr.net/gh/zed-0xff/ZombieBuddy@master/patreon.png[/img][/url]
